@@ -3,6 +3,8 @@ Implements EIP20 token standard: https://github.com/ethereum/EIPs/blob/master/EI
 .*/
 pragma solidity >=0.4.22 <0.7.4;
 
+import "hardhat/console.sol";
+
 contract EIP20 {
 
     // Looks like here we are creatiing a uint256 constant to the max unsigned value we can use
@@ -53,6 +55,9 @@ contract EIP20 {
         name = _tokenName;                                   // Set the name for display purposes
         decimals = _decimalUnits;                            // Amount of decimals for display purposes
         symbol = _tokenSymbol;                               // Set the symbol for display purposes
+        console.log("Inital amount is %d tokens", _initialAmount);
+        console.log("_tokenName %s", _tokenName);
+        console.log("Owner %s", msg.sender);
     }
 
     /*
@@ -98,6 +103,7 @@ contract EIP20 {
     @return balance The number of tokens held by the account
     */
     function balanceOf(address _owner) public view returns (uint256 balance) {
+        console.log("balance of %s", _owner);
         return balances[_owner];
     }
 
@@ -108,6 +114,7 @@ contract EIP20 {
     @param amount The amount of tokens allowed to be used by `spender`
     @return Returns true for a successful approval, false for unsuccessful
     */
+
     function approve(address _spender, uint256 _value) public returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value); //solhint-disable-line indent, no-unused-vars
@@ -119,10 +126,12 @@ contract EIP20 {
     If an address has given another address permision to spend, 
     look up how much money the permissioned account is able to spend
     @param owner The account of the token owner
-    @return The current allowance granted by `owner` to `spender`
     @param spender The account of the token spender
+    @return The current allowance granted by `owner` to `spender`
     */
-    function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
+    function allowance(address _owner, address _spender) public returns (uint256 remaining) {
+        emit Allowance(_owner, allowed[_owner][_spender]); //solhint-disable-line indent, no-unused-vars
+
         return allowed[_owner][_spender];
     }
 
@@ -133,6 +142,13 @@ contract EIP20 {
         address owner,
         address addresses,
         uint _value
+    );
+    /*
+    Transfer Event to emit and inform listeners
+    */
+    event Allowance(
+        address owner,
+        uint _owner
     );
 
     /*
